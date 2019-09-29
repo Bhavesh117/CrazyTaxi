@@ -3,28 +3,45 @@ import java.awt.event.KeyListener;
 
 public class GameInput implements KeyListener {
 
-    private GameContainer gc;
+    private GameWindow gw;
     private final int NUM_KEYS = 256;
     private boolean[] keys = new boolean[NUM_KEYS];
     private boolean[] keysLast = new boolean[NUM_KEYS];
 
-    public GameInput(GameContainer gc) {
-        this.gc = gc;
+    public GameInput(GameWindow gw) {
+        this.gw = gw;
 
-        gc.getGameWindow().getCanvas().addKeyListener(this);
+        gw.addKeyListener(this);
     }
 
     public void update() {
         for(int i = 0; i < NUM_KEYS; i++){
             keysLast[i] = keys[i];
         }
+    }
 
-        if (isKey(KeyEvent.VK_A)){
-            gc.getPlayer().moveLeft();
+    public void playerUpdate() {
+        if (isKey(KeyEvent.VK_A) || isKey(KeyEvent.VK_LEFT)){
+            gw.getPlayer().moveLeft();
         }
 
-        if (isKey(KeyEvent.VK_D)){
-            gc.getPlayer().moveRight();
+        if (isKey(KeyEvent.VK_D) || isKey(KeyEvent.VK_RIGHT)){
+            gw.getPlayer().moveRight();
+        }
+
+        if (isKey(KeyEvent.VK_W ) || isKey(KeyEvent.VK_UP)){
+            gw.getPlayer().moveUp();
+        }
+
+        if (isKey(KeyEvent.VK_S) || isKey(KeyEvent.VK_DOWN)){
+            gw.getPlayer().moveDown();
+        }
+
+        if ((isKey(KeyEvent.VK_S) && isKey(KeyEvent.VK_A)) || (isKey(KeyEvent.VK_W) && isKey(KeyEvent.VK_D))){
+            gw.getPlayer().moveDiagonalRight();
+        }
+        if((isKey(KeyEvent.VK_S) && isKey(KeyEvent.VK_D)) ||  (isKey(KeyEvent.VK_W) && isKey(KeyEvent.VK_A)) ){
+            gw.getPlayer().moveDiagonalLeft();
         }
     }
 

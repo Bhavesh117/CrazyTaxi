@@ -1,3 +1,5 @@
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.util.Random;
 import java.awt.Dimension;
 import java.awt.Color;
@@ -20,67 +22,184 @@ import javax.sound.sampled.*;
 public class Player {
 
     private static final int XSIZE = 30;
-    private static final int YSIZE = 10;
+    private static final int YSIZE = 60;
     private static final int XPOS = 200;
     private static final int YPOS = 200;
-    private int SPEED = 2;
-
+    private int speed = 4;
+    private int health = 3;
+    private int playerXSize = XSIZE;
+    private int playerYSize = YSIZE;
+    private double angle = 0;
+    private double accidentTime = System.nanoTime() / 1000000000.0;
+    private Graphics2D g2;
     private GameWindow gw;
     private Dimension dimension;
+//    private Splatter splatter;
+    private Color color;
     private int x;
     private int y;
+    private boolean isImmune  = false;
 
 
     public Player (GameWindow gw){
+        this.g2 = gw.getG();
         this.gw = gw;
 
-        dimension = gw.getCanvas().getSize();
+        dimension = gw.getSize();
+        color = Color.YELLOW;
         x = XPOS;
         y = YPOS;
     }
 
-    public void draw (Graphics2D g) {
-        g.setColor (Color.GREEN);
-        g.fill (new Rectangle2D.Double (x, y, XSIZE, YSIZE));
+    public void update(){
+        double presentTime = System.nanoTime() / 1000000000.0;
+        if (presentTime - accidentTime > 3){
+            isImmune = false;
+            color = Color.YELLOW;
+        }
     }
 
-    public void erase (Graphics2D g) {
-        g.setColor (Color.BLACK);
-        g.fill (new Rectangle2D.Double (x, y, XSIZE, YSIZE));
+    public void draw () {
+        g2.setColor (color);
+        AffineTransform at = AffineTransform.getRotateInstance(angle,x + playerXSize/2, y + playerYSize/2);
+        g2.fill(at.createTransformedShape(new Rectangle2D.Double (x, y, playerXSize, playerYSize)));
+        Area a = new Area(new Rectangle2D.Double (x, y, playerXSize, playerYSize));
+        a.transform(at);
+        g2.draw(a.getBounds2D());
     }
 
-    public Rectangle2D.Double getBoundingRectangle() {
-        return new Rectangle2D.Double (x, y, XSIZE, YSIZE);
+    public void erase () {
+        g2.setColor (Color.BLACK);
+        g2.fill(new Rectangle2D.Double (x, y, playerXSize, playerYSize));
+    }
+
+    public Area getBoundingArea() {
+        AffineTransform at = AffineTransform.getRotateInstance(angle,x + playerXSize/2, y + playerYSize/2);
+        Area a = new Area(new Rectangle2D.Double (x, y, playerXSize, playerYSize));
+        a.transform(at);
+        return a;
     }
 
     public void moveLeft () {
 
-        if (!gw.getCanvas().isVisible ()) return;
+        if (!gw.isVisible ()) return;
 
-        erase(gw.getG());
+        erase();
 
-        x = x - SPEED;
+        playerXSize = YSIZE;
+        playerYSize = XSIZE;
+        x = x - speed;
+        angle = 0;
 
         if (x < 0) {					// hits left wall
             x = 0;
-            erase(gw.getG());
+            erase();
         }
-
     }
 
     public void moveRight () {
 
-        if (!gw.getCanvas().isVisible ()) return;
+        if (!gw.isVisible ()) return;
 
-        erase(gw.getG());
+        erase();
 
-        x = x + SPEED;
+        playerXSize = YSIZE;
+        playerYSize = XSIZE;
+        x = x + speed;
+        angle = 0;
 
-        if (x + XSIZE >= dimension.width) {		// hits right wall
-            x = dimension.width - XSIZE;
-            erase(gw.getG());
+        if (x + playerXSize >= dimension.width) {		// hits right wall
+            x = dimension.width - playerXSize;
+            erase();
         }
+    }
+
+    public void moveUp () {
+        if (!gw.isVisible ()) return;
+
+        erase();
+
+        playerXSize = XSIZE;
+        playerYSize = YSIZE;
+        y = y - speed;
+        angle = 0;
+
+        if (y < 0) {					// hits left wall
+            y = 0;
+            erase();
+        }
+    }
+
+    public void moveDown () {
+        if (!gw.isVisible ()) return;
+
+        erase();
+
+        playerXSize = XSIZE;
+        playerYSize = YSIZE;
+        y = y + speed;
+        angle = 0;
+
+        if (y + playerYSize>= dimension.height) {					// hits left wall
+            y = dimension.height - playerYSize;
+            erase();
+        }
+    }
+
+    public void moveDiagonalRight () {
+        if (!gw.isVisible ()) return;
+
+        erase();
+        angle = 45;
 
     }
 
+    public void moveDiagonalLeft () {
+        if (!gw.isVisible ()) return;
+
+        erase();
+        angle = -45;
+    }
+
+    public void increaseSpeed() {
+        speed += 1;
+    }
+
+    public boolean isAccident(Vehicle v) {
+        Area playerBox = getBoundingArea();
+        Rectangle2D vehicleRec = v.getBoundingRectangle();
+
+        return (playerBox.intersects(vehicleRec));
+    }
+
+    public void damage(){
+        if(!isImmune){
+            health -= 1;
+            isImmune = true;
+            accidentTime = System.nanoTime() / 1000000000.0;
+            color = Color.GRAY;
+//            Splatter splatter = new Splatter(g2, x, y);
+            System.out.println("Accident!!");
+        }
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public boolean isImmune() {
+        return isImmune;
+    }
+
+    public int getHealth() {
+        return health;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
 }
