@@ -6,7 +6,7 @@ public class GameWindow extends Canvas implements Runnable {
 
     private Thread gameThread;
     private GameInput gameInput;
-    private BufferedImage image;
+    private BufferedImage image; 
     private BufferStrategy bs;
     private Player player;
     private Passenger passengers;
