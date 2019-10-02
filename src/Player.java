@@ -1,12 +1,11 @@
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 import java.awt.Dimension;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
-import javax.swing.JPanel;
 import java.applet.AudioClip;
 import java.awt.event.*;
 import java.awt.*;
@@ -22,15 +21,17 @@ import javax.sound.sampled.*;
 public class Player {
 
     private static final int XSIZE = 30;
-    private static final int YSIZE = 60;
+    private int YSIZE = 60;
     private static final int XPOS = 200;
     private static final int YPOS = 200;
     private int speed = 4;
     private int health = 3;
     private int playerXSize = XSIZE;
     private int playerYSize = YSIZE;
+    private int totalPassengers = 0;
     private double angle = 0;
     private double accidentTime = System.nanoTime() / 1000000000.0;
+    private List<People> passengers;
     private Graphics2D g2;
     private GameWindow gw;
     private Dimension dimension;
@@ -49,6 +50,7 @@ public class Player {
         color = Color.YELLOW;
         x = XPOS;
         y = YPOS;
+        passengers = new ArrayList<>();
     }
 
     public void update(){
@@ -63,9 +65,6 @@ public class Player {
         g2.setColor (color);
         AffineTransform at = AffineTransform.getRotateInstance(angle,x + playerXSize/2, y + playerYSize/2);
         g2.fill(at.createTransformedShape(new Rectangle2D.Double (x, y, playerXSize, playerYSize)));
-        Area a = new Area(new Rectangle2D.Double (x, y, playerXSize, playerYSize));
-        a.transform(at);
-        g2.draw(a.getBounds2D());
     }
 
     public void erase () {
@@ -181,6 +180,43 @@ public class Player {
 //            Splatter splatter = new Splatter(g2, x, y);
             System.out.println("Accident!!");
         }
+    }
+
+    public boolean isPowerUp(PowerUp powerUp){
+        Area playerBox = getBoundingArea();
+        Rectangle2D powerUpRec = powerUp.getBoundingRectangle();
+
+        return (playerBox.intersects(powerUpRec));
+    }
+
+    public boolean isPassenger(People passenger){
+        Area playerBox = getBoundingArea();
+        Rectangle2D passengerRec = passenger.getBoundingPassengerRectangle();
+
+        return (playerBox.intersects(passengerRec));
+    }
+
+    public boolean isDropOff(People passenger){
+        Area playerBox = getBoundingArea();
+        Rectangle2D dropOffRec = passenger.getBoundingDropOffRectangle();
+
+        return (playerBox.intersects(dropOffRec) && passengers.contains(passenger));
+    }
+
+    public void pickUpPassenger(People passenger){
+        passengers.add(passenger);
+        totalPassengers += 1;
+        YSIZE += 5;
+    }
+
+    public void dropOffPassenger(People passenger){
+        passengers.remove(passenger);
+        totalPassengers -= 1;
+        YSIZE -= 5;
+    }
+
+    public void healthUp(){
+        health += 1;
     }
 
     public int getSpeed() {

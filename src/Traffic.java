@@ -44,6 +44,17 @@ public class Traffic {
             if (gw.getPlayer().isAccident(vehicle) && gw.isPlaying()){
                 gw.getPlayer().damage();
             }
+
+            if(gw.getPowerUp() != null){
+                if(gw.getPowerUp().isFocusActive() && !vehicle.isInFocus()){
+                    vehicle.setFocus(0.25);
+                }
+
+                if (!gw.getPowerUp().isFocusActive() && vehicle.isInFocus()){
+                    vehicle.setFocus(4);
+                    System.out.println("focus out");
+                }
+            }
         }
     }
 

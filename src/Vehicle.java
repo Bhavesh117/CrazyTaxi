@@ -1,15 +1,15 @@
 import java.awt.*;
-import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.util.Random;
 
 public class Vehicle {
 
-    private int dx, dy;
+    private double dx, dy;
     private Dimension dimension;
-    private int x, y;
+    private double x, y;
     private int xSize, ySize;
     private Color color;
+    private boolean inFocus = false;
 
     public Vehicle (GameWindow gw, int dx, int dy){
         this.dx = dx;
@@ -52,11 +52,6 @@ public class Vehicle {
         g2.fill (new Rectangle2D.Double (x, y, xSize, ySize));
     }
 
-    public void erase (Graphics2D g2) {
-        g2.setColor (Color.BLACK);
-        g2.fill (new Rectangle2D.Double (x, y, xSize, ySize));
-    }
-
     public void move () {
         x += dx;
         y += dy;
@@ -81,5 +76,21 @@ public class Vehicle {
 
     public Rectangle2D.Double getBoundingRectangle() {
         return new Rectangle2D.Double (x, y, xSize, ySize);
+    }
+
+    public void setFocus(double factor) {
+        this.dx = dx * factor;
+        this.dy = dy * factor;
+
+        if(!inFocus)
+            inFocus = true;
+        else
+            inFocus = false;
+    }
+
+
+
+    public boolean isInFocus() {
+        return inFocus;
     }
 }

@@ -10,7 +10,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="file://$MODULE_DIR$/Audio" />
+          <root url="file://$MODULE_DIR$/assets" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

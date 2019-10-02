@@ -1,9 +1,6 @@
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GameWindow extends Canvas implements Runnable {
 
@@ -12,15 +9,20 @@ public class GameWindow extends Canvas implements Runnable {
     private BufferedImage image;
     private BufferStrategy bs;
     private Player player;
+    private Passenger passengers;
+    private PowerUp powerUp;
     private Traffic traffic;
     private Graphics2D g;
     private Splatter splatter;
+    private Dimension dimension;
 
     private boolean isRunning;
     private boolean isPlaying;
     private boolean canSplatter;
+    private boolean canSpawnPowerUp = true;
     private final double UPDATE_CAP = 1.0/60.0;
-    private int score = 0;
+    private int maxPassengers = 1;
+    private int score = 140;
     private int tMultiplier = 5;
     private double tsMultiplier = 10;
     private int psMultiplier = 5;
@@ -28,10 +30,10 @@ public class GameWindow extends Canvas implements Runnable {
 
     public GameWindow(GameContainer gc) {
         image = new BufferedImage(gc.getWidth(), gc.getHeight(), BufferedImage.TYPE_INT_RGB);
-        Dimension s = new Dimension((int)(gc.getWidth() * gc.getScale()), (int)(gc.getHeight() * gc.getScale()));
-        setPreferredSize(s);
-        setMaximumSize(s);
-        setMinimumSize(s);
+        dimension = new Dimension((int)(gc.getWidth() * gc.getScale()), (int)(gc.getHeight() * gc.getScale()));
+        setPreferredSize(dimension);
+        setMaximumSize(dimension);
+        setMinimumSize(dimension);
     }
 
     public void start() {
@@ -44,7 +46,10 @@ public class GameWindow extends Canvas implements Runnable {
             gameInput = new GameInput(this);
             gameThread = new Thread(this);
             player = new Player(this);
+            powerUp = new PowerUp(this);
+            passengers = new Passenger(this);
             traffic = new Traffic(this);
+
             gameThread.start();
         }
     }
@@ -79,8 +84,13 @@ public class GameWindow extends Canvas implements Runnable {
                 if(isPlaying){
                     gameInput.playerUpdate();
                     player.update();
+                    canSpawnPowerUp = updatePowerUpSpawn();
+                    powerUp.update();
+                    passengers.update();
+                    refreshPowerUp();
                     addTraffic();
                     increaseSpeed();
+                    increaseMaxPassengers();
                 }
 
                 traffic.update();
@@ -97,7 +107,6 @@ public class GameWindow extends Canvas implements Runnable {
                     fps = frames;
                     frames = 0;
                     System.out.println("FPS:" + fps);
-                    score++;
                     System.out.println("Score:" + score);
                 }
             }
@@ -132,6 +141,8 @@ public class GameWindow extends Canvas implements Runnable {
         if(player.isImmune())
             splatter.draw();
 
+        powerUp.draw();
+        passengers.draw();
         traffic.draw();
         player.draw();
         bs.show();
@@ -142,6 +153,17 @@ public class GameWindow extends Canvas implements Runnable {
             traffic.addVehicle();
             tMultiplier += 2;
         }
+    }
+
+    public void refreshPowerUp() {
+        if (score % 50 == 0 && score != 0 && !powerUp.isVisible() && canSpawnPowerUp){
+            powerUp = new PowerUp(this);
+            powerUp.setVisible(true);
+        }
+    }
+
+    public boolean updatePowerUpSpawn(){
+        return (score % 50 != 0);
     }
 
     public void increaseSpeed(){
@@ -156,6 +178,23 @@ public class GameWindow extends Canvas implements Runnable {
         }
     }
 
+    public void inFocus(){
+
+    }
+
+    public void increaseScore(){
+        score += 5;
+    }
+
+    public void increaseMaxPassengers(){
+        if (score > maxPassengers*20 && maxPassengers < 3)
+        maxPassengers += 1;
+    }
+
+    public int getMaxPassengers() {
+        return maxPassengers;
+    }
+
     public Graphics2D getG() {
         return g;
     }
@@ -166,5 +205,17 @@ public class GameWindow extends Canvas implements Runnable {
 
     public boolean isPlaying() {
         return isPlaying;
+    }
+
+    public Dimension getDimension() {
+        return dimension;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public PowerUp getPowerUp() {
+        return powerUp;
     }
 }
