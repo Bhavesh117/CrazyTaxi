@@ -7,6 +7,7 @@ public class PowerUp {
     private Graphics2D g2;
     private BufferedImage image;
     private GameWindow gw;
+    private SoundEffect sf;
     private int x, y;
     private int type;
     private double pickUpTime = System.nanoTime() / 1000000000.0;
@@ -15,11 +16,14 @@ public class PowerUp {
     private boolean isHeart = false;
     private boolean isFocus = false;
     private boolean isFocusActive = false;
+    private String heartUpAudio = "assets/audio/HeartUp.wav";
+    private String focusAudio = "assets/audio/Focus.wav";
 
 
     public PowerUp(GameWindow gw) {
         this.gw = gw;
         this.g2 = gw.getG();
+        sf = new SoundEffect();
         Random rand = new Random();
 
         type = rand.nextInt(2);
@@ -27,10 +31,12 @@ public class PowerUp {
         if(gw.getScore() < 150 || type == 0){
             type = 0;
             image = ImageReader.loadImage("assets/images/heart.png");
+            sf.setFile(heartUpAudio);
             isHeart = true;
         }
         else {
             image = ImageReader.loadImage("assets/images/focus.png");
+            sf.setFile(focusAudio);
             isFocus = true;
         }
 
@@ -56,6 +62,7 @@ public class PowerUp {
                 isFocusActive = true;
             }
 
+            sf.play();
             isVisible = false;
         }
 

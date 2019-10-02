@@ -1,5 +1,3 @@
-import java.awt.*;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;

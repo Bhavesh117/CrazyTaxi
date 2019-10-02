@@ -53,10 +53,6 @@ public class People {
         isDroppedOff = droppedOff;
     }
 
-    public boolean isDroppedOff() {
-        return isDroppedOff;
-    }
-
     public boolean isPassengerCollected() {
         return isPassengerCollected;
     }

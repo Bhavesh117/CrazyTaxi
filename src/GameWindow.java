@@ -15,22 +15,30 @@ public class GameWindow extends Canvas implements Runnable {
     private Graphics2D g;
     private Splatter splatter;
     private Dimension dimension;
+    private SoundEffect soundEffect;
+    private HUD hud;
+    private GameContainer gameContainer;
 
     private boolean isRunning;
     private boolean isPlaying;
+    private boolean isPaused;
     private boolean canSplatter;
-    private boolean canSpawnPowerUp = true;
+    private boolean canSpawnPowerUp;
+    private boolean isPlayerDead;
     private final double UPDATE_CAP = 1.0/60.0;
-    private int maxPassengers = 1;
-    private int score = 140;
+    private int maxPassengers;
+    private int score;
+    private int fps;
     private int tMultiplier = 5;
     private double tsMultiplier = 10;
     private int psMultiplier = 5;
+    private String backgroundAudio = "assets/audio/Background.wav";
 
 
     public GameWindow(GameContainer gc) {
         image = new BufferedImage(gc.getWidth(), gc.getHeight(), BufferedImage.TYPE_INT_RGB);
         dimension = new Dimension((int)(gc.getWidth() * gc.getScale()), (int)(gc.getHeight() * gc.getScale()));
+        gameContainer = gc;
         setPreferredSize(dimension);
         setMaximumSize(dimension);
         setMinimumSize(dimension);
@@ -38,20 +46,30 @@ public class GameWindow extends Canvas implements Runnable {
 
     public void start() {
         if (gameThread == null) {
-            isRunning = true;
-            createBufferStrategy(3);
-            bs = getBufferStrategy();
-            g = (Graphics2D)bs.getDrawGraphics();
-            g.setRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
-            gameInput = new GameInput(this);
-            gameThread = new Thread(this);
-            player = new Player(this);
-            powerUp = new PowerUp(this);
-            passengers = new Passenger(this);
-            traffic = new Traffic(this);
-
+            setUpGame();
             gameThread.start();
         }
+    }
+
+    public void setUpGame() {
+        isRunning = true;
+        createBufferStrategy(3);
+        bs = getBufferStrategy();
+        g = (Graphics2D)bs.getDrawGraphics();
+        g.setRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
+        gameInput = new GameInput(this);
+        gameThread = new Thread(this);
+        player = new Player(this);
+        powerUp = new PowerUp(this);
+        passengers = new Passenger(this);
+        traffic = new Traffic(this);
+        soundEffect = new SoundEffect();
+        hud = new HUD(this);
+        score = 0;
+        maxPassengers = 1;
+        canSpawnPowerUp = true;
+        isPlayerDead = false;
+        isPaused = false;
     }
 
     public void run () {
@@ -63,7 +81,10 @@ public class GameWindow extends Canvas implements Runnable {
         double unprocessedTime = 0;
         double frameTime = 0;
         int frames = 0;
-        int fps;
+
+        soundEffect.setFile(backgroundAudio);
+        soundEffect.play();
+        soundEffect.loop();
 
         while (isRunning) {
             render = false;
@@ -75,31 +96,37 @@ public class GameWindow extends Canvas implements Runnable {
             unprocessedTime += passedTime;
             frameTime += passedTime;
 
+
             while(unprocessedTime >= UPDATE_CAP) {
                 unprocessedTime -= UPDATE_CAP;
                 render = true;
 
-                gameInput.update();
+                if(!isPaused){
+                    if(isPlaying && !isPlayerDead){
+                        gameInput.playerUpdate();
+                        player.update();
+                        canSpawnPowerUp = updatePowerUpSpawn();
+                        powerUp.update();
+                        passengers.update();
+                        refreshPowerUp();
+                        addTraffic();
+                        increaseSpeed();
+                        increaseMaxPassengers();
+                    }
 
-                if(isPlaying){
-                    gameInput.playerUpdate();
-                    player.update();
-                    canSpawnPowerUp = updatePowerUpSpawn();
-                    powerUp.update();
-                    passengers.update();
-                    refreshPowerUp();
-                    addTraffic();
-                    increaseSpeed();
-                    increaseMaxPassengers();
+                    traffic.update();
                 }
-
-                traffic.update();
 
                 if (!player.isImmune()) canSplatter = true;
 
                 if (player.isImmune() && canSplatter){
                     splatter = new Splatter(g, player.getX(), player.getY());
                     canSplatter = false;
+                }
+
+                if (player.getHealth() <= 0){
+                    isPlayerDead = true;
+                    isPlaying = false;
                 }
 
                 if (frameTime >= 1.0){
@@ -111,10 +138,29 @@ public class GameWindow extends Canvas implements Runnable {
                 }
             }
 
-            if(!isPlaying){
+            if(gameInput.pauseGame()){
+                isPaused = true;
+                isPlaying = false;
+            }
+
+            if(!isPlaying && !isPlayerDead){
                 if(gameInput.startGame()){
                     isPlaying = true;
+                    isPaused = false;
                 }
+            }
+
+            if(!isPlaying && isPlayerDead){
+                if(gameInput.startGame()){
+                    System.out.println("hi");
+                    setUpGame();
+                    isPlaying = true;
+
+                }
+            }
+
+            if(gameInput.endGame()){
+                isRunning = false;
             }
 
             if(render){
@@ -132,6 +178,7 @@ public class GameWindow extends Canvas implements Runnable {
 
         }
 
+        gameContainer.dispose();
     }
 
     public void update() {
@@ -145,6 +192,7 @@ public class GameWindow extends Canvas implements Runnable {
         passengers.draw();
         traffic.draw();
         player.draw();
+        hud.draw();
         bs.show();
     }
 
@@ -176,10 +224,6 @@ public class GameWindow extends Canvas implements Runnable {
             player.increaseSpeed();
             psMultiplier += 2;
         }
-    }
-
-    public void inFocus(){
-
     }
 
     public void increaseScore(){
@@ -217,5 +261,17 @@ public class GameWindow extends Canvas implements Runnable {
 
     public PowerUp getPowerUp() {
         return powerUp;
+    }
+
+    public int getFps() {
+        return fps;
+    }
+
+    public boolean isPlayerDead() {
+        return isPlayerDead;
+    }
+
+    public boolean isPaused() {
+        return isPaused;
     }
 }

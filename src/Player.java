@@ -6,17 +6,6 @@ import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
-import java.applet.AudioClip;
-import java.awt.event.*;
-import java.awt.*;
-import java.io.File;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-
-import java.io.IOException;
-
-import javax.sound.sampled.*;
 
 public class Player {
 
@@ -25,7 +14,7 @@ public class Player {
     private static final int XPOS = 200;
     private static final int YPOS = 200;
     private int speed = 4;
-    private int health = 3;
+    private int health = 5;
     private int playerXSize = XSIZE;
     private int playerYSize = YSIZE;
     private int totalPassengers = 0;
@@ -35,8 +24,11 @@ public class Player {
     private Graphics2D g2;
     private GameWindow gw;
     private Dimension dimension;
-//    private Splatter splatter;
     private Color color;
+    private SoundEffect sf;
+    private String pickUpAudio = "assets/audio/Pickup.wav";
+    private String dropOffAudio = "assets/audio/DropOff.wav";
+    private String crashAudio = "assets/audio/Crash.wav";
     private int x;
     private int y;
     private boolean isImmune  = false;
@@ -51,6 +43,7 @@ public class Player {
         x = XPOS;
         y = YPOS;
         passengers = new ArrayList<>();
+        sf = new SoundEffect();
     }
 
     public void update(){
@@ -178,7 +171,8 @@ public class Player {
             accidentTime = System.nanoTime() / 1000000000.0;
             color = Color.GRAY;
 //            Splatter splatter = new Splatter(g2, x, y);
-            System.out.println("Accident!!");
+            sf.setFile(crashAudio);
+            sf.play();
         }
     }
 
@@ -205,12 +199,16 @@ public class Player {
 
     public void pickUpPassenger(People passenger){
         passengers.add(passenger);
+        sf.setFile(pickUpAudio);
+        sf.play();
         totalPassengers += 1;
         YSIZE += 5;
     }
 
     public void dropOffPassenger(People passenger){
         passengers.remove(passenger);
+        sf.setFile(dropOffAudio);
+        sf.play();
         totalPassengers -= 1;
         YSIZE -= 5;
     }
