@@ -11,8 +11,8 @@ public class HUD {
         this.gw = gw;
         this.g2 = gw.getG();
 
-        space = new Font("Arial Black", Font.PLAIN, 50);
-        info = new Font("Arial Black", Font.PLAIN, 25);
+        space = new Font("Arial Black", Font.PLAIN, 40);
+        info = new Font("Arial Black", Font.PLAIN, 20);
     }
 
     public void draw(){
@@ -22,6 +22,9 @@ public class HUD {
         else if (gw.isPlayerDead()){
             gameOver();
         }
+        else if (gw.isPaused()){
+            gamePaused();
+        }
         else {
             gamePlaying();
         }
@@ -30,7 +33,19 @@ public class HUD {
     public void gameStart(){
         g2.setColor(new Color(rgb, rgb, rgb));
         g2.setFont(space);
-        g2.drawString("Press Space To Start", 90 * 4, 210 * 4);
+        g2.drawString("Press Space To Start", 85 * 3, 210 * 3);
+
+        rgb -= 2;
+
+        if(rgb <= 0){
+            rgb = 252;
+        }
+    }
+
+    public void gamePaused(){
+        g2.setColor(new Color(rgb, rgb, rgb));
+        g2.setFont(space);
+        g2.drawString("Press Space To Resume", 70 * 3, 210 * 3);
 
         rgb -= 2;
 
@@ -42,19 +57,19 @@ public class HUD {
     public void gamePlaying(){
         g2.setColor(Color.white);
         g2.setFont(info);
-        g2.drawString("Score: " + gw.getScore(), 10 * 4, 10 * 4);
-        g2.drawString("Health: " + gw.getPlayer().getHealth(), 140 * 4, 10 * 4);
-        g2.drawString("FPS: " + gw.getFps(), 280 * 4, 10 * 4);
+        g2.drawString("Score: " + gw.getScore(), 10 * 3, 10 * 3);
+        g2.drawString("Health: " + gw.getPlayer().getHealth(), 140 * 3, 10 * 3);
+        g2.drawString("FPS: " + gw.getFps(), 280 * 3, 10 * 3);
     }
 
     public void gameOver(){
         g2.setColor(Color.white);
         g2.setFont(space);
-        g2.drawString("You Died!", 130 * 4, 100 * 4);
-        g2.drawString("Your Score: " + gw.getScore(), 110 * 4, 140 * 4);
+        g2.drawString("You Died!", 130 * 3, 100 * 3);
+        g2.drawString("Your Score: " + gw.getScore(), 110 * 3, 140 * 3);
 
         g2.setColor(new Color(rgb, rgb, rgb));
-        g2.drawString("Press Space To Start Over", 70 * 4, 210 * 4);
+        g2.drawString("Press Space To Start Over", 70 * 3, 210 * 3);
 
         rgb -= 2;
 

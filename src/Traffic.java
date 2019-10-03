@@ -19,6 +19,7 @@ public class Traffic {
         addVehicle();
     }
 
+//    Adds a vehicle to the amount that are on screen and switches between adding a new horizontal and vertical vehicle. Direction of the vehicles are randomized.
     public void addVehicle(){
         if(vehicles.size() >= 20) return;
 
@@ -43,6 +44,7 @@ public class Traffic {
                 gw.getPlayer().damage();
             }
 
+//            Setting of focus power up to all vehicles
             if(gw.getPowerUp() != null){
                 if(gw.getPowerUp().isFocusActive() && !vehicle.isInFocus()){
                     vehicle.setFocus(0.25);
@@ -50,7 +52,6 @@ public class Traffic {
 
                 if (!gw.getPowerUp().isFocusActive() && vehicle.isInFocus()){
                     vehicle.setFocus(4);
-                    System.out.println("focus out");
                 }
             }
         }
@@ -62,6 +63,7 @@ public class Traffic {
         }
     }
 
+//    Increases speed for new vehicles.
     public void increaseSpeed(){
         if (speed >= 10) return;
 

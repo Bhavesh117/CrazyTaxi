@@ -32,6 +32,6 @@ public class Splatter {
         g2.fill(new Ellipse2D.Double(x - 20, y + 10, r7, r3));
 
         if(red > 0)
-            red--;
+            red--; // fade effect
     }
 }

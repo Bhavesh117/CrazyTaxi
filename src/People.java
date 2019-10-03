@@ -38,11 +38,11 @@ public class People {
     }
 
     public Rectangle2D.Double getBoundingDropOffRectangle() {
-        return new Rectangle2D.Double (dx, dy, SIZE, SIZE);
+        return new Rectangle2D.Double (dx - SIZE / 2, dy - SIZE / 2, SIZE * 2, SIZE * 2);
     }
 
     public Rectangle2D.Double getBoundingPassengerRectangle() {
-        return new Rectangle2D.Double (px, py, SIZE, SIZE);
+        return new Rectangle2D.Double (px - SIZE / 2, py - SIZE/2, SIZE * 2, SIZE * 2);
     }
 
     public void setPassengerCollected(boolean passengerCollected) {

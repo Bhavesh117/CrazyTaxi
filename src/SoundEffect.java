@@ -4,7 +4,7 @@ import javax.sound.sampled.Clip;
 import java.io.File;
 
 public class SoundEffect {
-    Clip clip;
+    private Clip clip;
 
     public void setFile(String soundFileName){
 

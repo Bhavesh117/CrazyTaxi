@@ -26,9 +26,9 @@ public class PowerUp {
         sf = new SoundEffect();
         Random rand = new Random();
 
-        type = rand.nextInt(2);
+        type = rand.nextInt(2); // USed to randomly choose a power up type 0 is heart and 1 is focus.
 
-        if(gw.getScore() < 150 || type == 0){
+        if(gw.getScore() < 150 || type == 0){ // Only heart power up available for scores below 150.
             type = 0;
             image = ImageReader.loadImage("assets/images/heart.png");
             sf.setFile(heartUpAudio);
@@ -68,7 +68,6 @@ public class PowerUp {
 
         if (presentTime - pickUpTime > 6 && isFocusActive){
             isFocusActive = false;
-            System.out.println("is focus is not active");
         }
     }
 

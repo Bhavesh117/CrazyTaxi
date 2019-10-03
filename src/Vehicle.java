@@ -18,6 +18,7 @@ public class Vehicle {
         int rgb = new Random().nextInt((200 - 150) + 1) + 150;
         color = new Color(rgb, rgb, rgb);
 
+//        Random vehicle size based on movement direction.
         if (dx != 0){
             xSize = new Random().nextInt((80 - 60) + 1) + 60;
             ySize = new Random().nextInt((40 - 30) + 1) + 30;
@@ -28,6 +29,7 @@ public class Vehicle {
             xSize = new Random().nextInt((40 - 30) + 1) + 30;
         }
 
+//        Determine spawn location off screen based on vehicle direction.
         if (dx > 0){
             x = xSize * -1;
             y = new Random().nextInt((dimension.height - 10) + 1) + 10;
@@ -52,6 +54,7 @@ public class Vehicle {
         g2.fill (new Rectangle2D.Double (x, y, xSize, ySize));
     }
 
+//    vehicles off screen teleport to the other side at a new random position
     public void move () {
         x += dx;
         y += dy;

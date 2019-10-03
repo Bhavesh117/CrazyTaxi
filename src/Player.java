@@ -17,7 +17,6 @@ public class Player {
     private int health = 5;
     private int playerXSize = XSIZE;
     private int playerYSize = YSIZE;
-    private int totalPassengers = 0;
     private double angle = 0;
     private double accidentTime = System.nanoTime() / 1000000000.0;
     private List<People> passengers;
@@ -46,6 +45,7 @@ public class Player {
         sf = new SoundEffect();
     }
 
+//    Player immune check.
     public void update(){
         double presentTime = System.nanoTime() / 1000000000.0;
         if (presentTime - accidentTime > 3){
@@ -65,6 +65,7 @@ public class Player {
         g2.fill(new Rectangle2D.Double (x, y, playerXSize, playerYSize));
     }
 
+//    Returns bounding area for player.
     public Area getBoundingArea() {
         AffineTransform at = AffineTransform.getRotateInstance(angle,x + playerXSize/2, y + playerYSize/2);
         Area a = new Area(new Rectangle2D.Double (x, y, playerXSize, playerYSize));
@@ -157,6 +158,7 @@ public class Player {
         speed += 1;
     }
 
+//    Determines if the player has collied with a vehicle.
     public boolean isAccident(Vehicle v) {
         Area playerBox = getBoundingArea();
         Rectangle2D vehicleRec = v.getBoundingRectangle();
@@ -164,18 +166,19 @@ public class Player {
         return (playerBox.intersects(vehicleRec));
     }
 
+//    decreases player health and sets player to being immune to hits.
     public void damage(){
         if(!isImmune){
             health -= 1;
             isImmune = true;
             accidentTime = System.nanoTime() / 1000000000.0;
-            color = Color.GRAY;
-//            Splatter splatter = new Splatter(g2, x, y);
+            color = Color.WHITE;
             sf.setFile(crashAudio);
             sf.play();
         }
     }
 
+//    Determines if the player has collied with a power up.
     public boolean isPowerUp(PowerUp powerUp){
         Area playerBox = getBoundingArea();
         Rectangle2D powerUpRec = powerUp.getBoundingRectangle();
@@ -183,6 +186,7 @@ public class Player {
         return (playerBox.intersects(powerUpRec));
     }
 
+//    Determines if the player has collied with a passenger.
     public boolean isPassenger(People passenger){
         Area playerBox = getBoundingArea();
         Rectangle2D passengerRec = passenger.getBoundingPassengerRectangle();
@@ -190,6 +194,7 @@ public class Player {
         return (playerBox.intersects(passengerRec));
     }
 
+//    Determines if the player has collied with a passenger drop off.
     public boolean isDropOff(People passenger){
         Area playerBox = getBoundingArea();
         Rectangle2D dropOffRec = passenger.getBoundingDropOffRectangle();
@@ -197,19 +202,19 @@ public class Player {
         return (playerBox.intersects(dropOffRec) && passengers.contains(passenger));
     }
 
+//    Adds a passenger to the player car and increases player size.
     public void pickUpPassenger(People passenger){
         passengers.add(passenger);
         sf.setFile(pickUpAudio);
         sf.play();
-        totalPassengers += 1;
         YSIZE += 5;
     }
 
+//    Removes a passenger from the player car and decreases player size.
     public void dropOffPassenger(People passenger){
         passengers.remove(passenger);
         sf.setFile(dropOffAudio);
         sf.play();
-        totalPassengers -= 1;
         YSIZE -= 5;
     }
 

@@ -26,6 +26,8 @@ public class Passenger {
         }
     }
 
+//    Increases the amount of passengers that could be spawned based on the maxPassengers variable. Determines if player has collided with passengers and drop offs and
+//    performs necessary updates.
     public void update() {
         People p = null;
 

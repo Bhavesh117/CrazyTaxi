@@ -7,7 +7,7 @@ public class GameContainer extends JFrame {
 
     private int width = 320;
     private int height = 240;
-    private float scale = 4f;
+    private float scale = 3f;
 
     private String title = "Crazy Taxi";
 
@@ -38,9 +38,5 @@ public class GameContainer extends JFrame {
 
     public float getScale() {
         return scale;
-    }
-
-    public GameWindow getGameWindow() {
-        return gameWindow;
     }
 }
